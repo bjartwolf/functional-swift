@@ -27,7 +27,7 @@ func apply<A,B>(_ fOpt: ((A) -> (B))?) -> (_ xOpt: A?) -> (B?)
     { xOpt in
         switch (fOpt, xOpt) {
             case (.some(let f), .some(let x)):
-                return f(x) 
+                return .some(f(x)) 
             case (_,_):
                 return .none
         }
