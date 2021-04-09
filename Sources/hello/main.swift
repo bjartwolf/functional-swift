@@ -5,6 +5,16 @@ func add(_ x: Int) -> (_ y: Int) -> Int {
     { y in return x + y }
 }
 
+func pure<T>(_ x: T) -> Optional<T> {
+    x
+}
+
+let fortytwo = 42
+let foo = pure(fortytwo)
+
+print(fortytwo)
+print(foo)
+
 let addTwo = add(2)
 
 print(addTwo(3))
