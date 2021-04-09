@@ -22,12 +22,14 @@ let foo = pure(fortytwo)
 // (a->b) option -> a option -> b option
 // The apply function for Options
 // https://github.com/nrkno/fsharpskolen/blob/master/ddd-fsharp/functional/apply.fsx#L48
-func apply<A,B>(_ fOpt: ((A) -> (B))?) -> (_ xOpt: A?) -> (B?) 
+//func apply<A,B>(_ fOpt: ((A) -> (B))?) -> (_ xOpt: A?) -> (B?) 
+func apply<A,B>(_ fOpt: (Optional<(A) -> (B)>)) -> (_ xOpt: Optional<A>) -> (Optional<B>) 
 {
     { xOpt in
         switch (fOpt, xOpt) {
             case (.some(let f), .some(let x)):
-                return .some(f(x)) 
+                //return .some(f(x)) // looks like i can just do f(x) and the compiler does stuff
+                return f(x) // looks like i can just do f(x) and the compiler does stuff
             case (_,_):
                 return .none
         }
@@ -35,7 +37,7 @@ func apply<A,B>(_ fOpt: ((A) -> (B))?) -> (_ xOpt: A?) -> (B?)
 }
 
 // OPtion map a->b og lager en E<A> til E<A> til E<B>
-func map<A,B>(_ fn: @escaping (A)->(B)) -> ((A?) -> (B)?) {
+func map<A,B>(_ fn: @escaping (A)->(B)) -> ((Optional<A>) -> (Optional<B>)) {
     apply(pure(fn))
 }
 
