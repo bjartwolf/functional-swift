@@ -1,14 +1,7 @@
-print("Hello, World!") 
-
 // https://www.vadimbulavin.com/pure-functions-higher-order-functions-and-first-class-functions-in-swift/
 func add(_ x: Int) -> (_ y: Int) -> Int {
     { y in return x + y }
 }
-
-let addTwo = add(2)
-
-print(addTwo(3))
-print(addTwo(5))
 
 
 // https://github.com/nrkno/fsharpskolen/blob/master/ddd-fsharp/functional/apply.fsx#L32
@@ -23,10 +16,6 @@ func id<T>(param: T) -> T {
 
 let fortytwo = 42
 let foo = pure(fortytwo)
-
-print(fortytwo)
-print(foo)
-
 
 // Apply: E<(a->b)> -> E<a> -> E<b>
 // In the option case here
@@ -45,13 +34,17 @@ func apply<A,B>(_ fOpt: ((A) -> (B))?) -> (_ xOpt: A?) -> (B?)
     }
 }
 
-let aFive = Int("5") 
-print(aFive)
-
 // OPtion map a->b og lager en E<A> til E<A> til E<B>
 func map<A,B>(_ fn: @escaping (A)->(B)) -> ((A?) -> (B)?) {
     apply(pure(fn))
 }
 
-let foobar = map(addTwo)(aFive)
-print(foobar)
+let addTwo = add(2)
+print(addTwo(5))
+
+let aFive = Int("5") 
+print(aFive)
+
+let maybeTwoerAdder = map(addTwo)
+let result = maybeTwoerAdder(aFive)
+print(result)
