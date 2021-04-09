@@ -48,3 +48,6 @@ print(aFive)
 let maybeTwoerAdder = map(addTwo)
 let result = maybeTwoerAdder(aFive)
 print(result)
+
+let result2 = maybeTwoerAdder(.none)
+print(result2)
