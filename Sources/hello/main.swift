@@ -33,7 +33,7 @@ print(foo)
 // (a->b) option -> a option -> b option
 // The apply function for Options
 // https://github.com/nrkno/fsharpskolen/blob/master/ddd-fsharp/functional/apply.fsx#L48
-func apply<A,B>(fOpt: ((A) -> (B))?) -> (_ xOpt: A?) -> (B?) 
+func apply<A,B>(_ fOpt: ((A) -> (B))?) -> (_ xOpt: A?) -> (B?) 
 {
     { xOpt in
         switch (fOpt, xOpt) {
@@ -47,3 +47,11 @@ func apply<A,B>(fOpt: ((A) -> (B))?) -> (_ xOpt: A?) -> (B?)
 
 let aFive = Int("5") 
 print(aFive)
+
+// OPtion map a->b og lager en E<A> til E<A> til E<B>
+func map<A,B>(_ fn: @escaping (A)->(B)) -> ((A?) -> (B)?) {
+    apply(pure(fn))
+}
+
+let foobar = map(addTwo)(aFive)
+print(foobar)
