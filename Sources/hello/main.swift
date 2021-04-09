@@ -41,5 +41,9 @@ func apply<A,B>(fOpt: ((A) -> (B))?) -> (_ xOpt: A?) -> (B?)
                 return f(x) 
             case (_,_):
                 return .none
+        }
     }
 }
+
+let aFive = Int("5") 
+print(aFive)
