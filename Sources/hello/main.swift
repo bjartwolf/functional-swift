@@ -7,7 +7,7 @@ func add(_ x: Int) -> (_ y: Int) -> Int {
 // https://github.com/nrkno/fsharpskolen/blob/master/ddd-fsharp/functional/apply.fsx#L32
 // This is option.pure but I do not know how to make an option module in swift yet 
 func pure<T>(_ x: T) -> Optional<T> {
-    x
+    .some(x)
 }
 
 func id<T>(param: T) -> T {
