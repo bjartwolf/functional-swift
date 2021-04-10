@@ -6,7 +6,7 @@ func add(_ x: Int) -> (_ y: Int) -> Int {
 
 // https://github.com/nrkno/fsharpskolen/blob/master/ddd-fsharp/functional/apply.fsx#L32
 // This is option.pure but I do not know how to make an option module in swift yet 
-func pure<T>(_ x: T) -> Optional<T> {
+func OptPure<T>(_ x: T) -> Optional<T> {
     .some(x)
 }
 
@@ -15,7 +15,7 @@ func id<T>(param: T) -> T {
 }
 
 let fortytwo = 42
-let foo = pure(fortytwo)
+let foo = OptPure(fortytwo)
 
 // Apply: E<(a->b)> -> E<a> -> E<b>
 // In the option case here
@@ -23,7 +23,7 @@ let foo = pure(fortytwo)
 // The apply function for Options
 // https://github.com/nrkno/fsharpskolen/blob/master/ddd-fsharp/functional/apply.fsx#L48
 //func apply<A,B>(_ fOpt: ((A) -> (B))?) -> (_ xOpt: A?) -> (B?) 
-func apply<A,B>(_ fOpt: (Optional<(A) -> (B)>)) -> (_ xOpt: Optional<A>) -> (Optional<B>) 
+func OptApply<A,B>(_ fOpt: (Optional<(A) -> (B)>)) -> (_ xOpt: Optional<A>) -> (Optional<B>) 
 {
     { xOpt in
         switch (fOpt, xOpt) {
@@ -37,8 +37,8 @@ func apply<A,B>(_ fOpt: (Optional<(A) -> (B)>)) -> (_ xOpt: Optional<A>) -> (Opt
 }
 
 // OPtion map a->b og lager en E<A> til E<A> til E<B>
-func map<A,B>(_ fn: @escaping (A)->(B)) -> ((Optional<A>) -> (Optional<B>)) {
-    apply(pure(fn))
+func OptMap<A,B>(_ fn: @escaping (A)->(B)) -> ((Optional<A>) -> (Optional<B>)) {
+    OptApply(OptPure(fn))
 }
 
 let addTwo = add(2)
@@ -47,9 +47,26 @@ print(addTwo(5))
 let aFive = Int("5") 
 print(aFive)
 
-let maybeTwoerAdder = map(addTwo)
+let maybeTwoerAdder = OptMap(addTwo)
 let result = maybeTwoerAdder(aFive)
 print(result)
 
 let result2 = maybeTwoerAdder(.none)
 print(result2)
+
+func Listpure<T>(_ x: T) -> [T] {
+    [x]
+}
+
+func Listapply<A,B>(_ fOpt: (Optional<(A) -> (B)>)) -> (_ xOpt: Optional<A>) -> (Optional<B>) 
+{
+    { xOpt in
+        switch (fOpt, xOpt) {
+            case (.some(let f), .some(let x)):
+                //return .some(f(x)) // looks like i can just do f(x) and the compiler does stuff
+                return f(x) // looks like i can just do f(x) and the compiler does stuff
+            case (_,_):
+                return .none
+        }
+    }
+}
