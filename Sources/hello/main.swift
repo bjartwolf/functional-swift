@@ -88,6 +88,7 @@ let listAdder = ListMap(addTwo)
 print(listAdder([1,2,3]))
 
 
+// Have not tested them, the signature looks ok but need to figure out if they work
 func OptBind<A,B>(_ fOpt: @escaping ((A) -> Optional<(B)>)) -> (_ xOpt: Optional<A>) -> (Optional<B>) 
 {
     { xOpt in
@@ -105,3 +106,4 @@ func ListBind<A,B>(_ f: @escaping ((A) -> Array<(B)>)) -> (_ xs: Array<A>) -> (A
         xs.flatMap { x in f(x) }
     }
 }
+
