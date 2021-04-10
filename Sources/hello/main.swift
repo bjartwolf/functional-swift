@@ -78,7 +78,7 @@ print(aFive)
 let result = maybeTwoerAdder(aFive)
 print(result)
 
-// And it works for nonoptional values too 
+// And it works for for the .none types too 
 let result2 = maybeTwoerAdder(Int("Five"))
 print(result2)
 
