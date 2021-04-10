@@ -86,3 +86,18 @@ print(result2)
 let listAdder = ListMap(addTwo)
 
 print(listAdder([1,2,3]))
+
+
+func OptBind<A,B>(_ fOpt: @escaping ((A) -> Optional<(B)>)) -> (_ xOpt: Optional<A>) -> (Optional<B>) 
+{
+    { xOpt in
+        switch xOpt {
+            case .some(let x):
+                return fOpt(x) 
+            case .none:
+                return .none
+        }
+    }
+}
+
+
