@@ -121,7 +121,7 @@ func parseNumber (_ nr: String) -> Optional<Int> {
 // and just lift the function to work on lists
 let parseNumbers2 = ListMap(parseNumber)
 
-let someNumbers = ["2", "To", "4", "Fire"]
+let someNumbers = ["2", "To", "-4", "Fire"]
 // These are the same, but List.map takes care of making the parseNumber 
 print(parseNumbers(someNumbers))
 print(parseNumbers2(someNumbers))
