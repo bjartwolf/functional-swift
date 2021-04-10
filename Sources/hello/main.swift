@@ -113,7 +113,7 @@ func parseNumbers (_ s: Array<String>) -> [Optional<Int>] {
     return s.compactMap{ Int($0)} 
 }
 
-// So we can instead make a simple function that does it
+// So we can instead make a simple function that does it (a world crossing one)
 func parseNumber (_ nr: String) -> Optional<Int> {
     return Int(nr)
 }
@@ -129,3 +129,18 @@ print(parseNumbers2(someNumbers))
 // We also made a function that we lifted from summing numbers to summing optional numbers. We can lift that one to work on lists as well
 let maybeTwoerListerAdder = ListMap(maybeTwoerAdder) 
 print(maybeTwoerListerAdder(parseNumbers2(someNumbers)))
+
+// for some more world crossing
+func OrderQty (_ qty: Int) -> Optional<Int> {
+    if qty >= 0 { return qty }
+    else { return .none }
+}
+
+
+// if we try to map this we get optional optionals.
+let mappedOrderQty = ListMap(OptMap(OrderQty))
+print(mappedOrderQty(parseNumbers2(someNumbers)))
+
+// nested optionals sucks. me should bind those... (we can also bind them with id I think for later)
+let boundOrderQty = ListMap(OptBind(OrderQty))
+print(boundOrderQty(parseNumbers2(someNumbers)))
