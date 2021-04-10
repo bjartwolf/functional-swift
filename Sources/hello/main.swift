@@ -54,19 +54,29 @@ print(result)
 let result2 = maybeTwoerAdder(.none)
 print(result2)
 
-func Listpure<T>(_ x: T) -> [T] {
+func ListPure<T>(_ x: T) -> [T] {
     [x]
 }
 
-func Listapply<A,B>(_ fOpt: (Optional<(A) -> (B)>)) -> (_ xOpt: Optional<A>) -> (Optional<B>) 
-{
+
+func incrementValues(a: [Int]) -> [Int] { 
+    return a.map { $0 + 1 } 
+} 
+
+
+//https://subscription.packtpub.com/book/application_development/9781787284500/6/ch06lvl1sec48/the-join-function
+// This only does it for one list of fs, but I want apply as list of f and list of x
+func ListApply<A,B>(_ fOpt: (Array<(A) -> (B)>)) -> (_ xOpt: Array<A>) -> (Array<B>) {
     { xOpt in
-        switch (fOpt, xOpt) {
-            case (.some(let f), .some(let x)):
-                //return .some(f(x)) // looks like i can just do f(x) and the compiler does stuff
-                return f(x) // looks like i can just do f(x) and the compiler does stuff
-            case (_,_):
-                return .none
-        }
+        fOpt.flatMap { 
+            f in xOpt.map { x in f(x)}} 
     }
 }
+
+func ListMap<A,B>(_ fn: @escaping (A)->(B)) -> ((Array<A>) -> (Array<B>)) {
+    ListApply(ListPure(fn))
+}
+
+let listAdder = ListMap(addTwo)
+
+print(listAdder([1,2,3]))
