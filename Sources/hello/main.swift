@@ -46,10 +46,10 @@ func incrementValues(a: [Int]) -> [Int] {
 //https://subscription.packtpub.com/book/application_development/9781787284500/6/ch06lvl1sec48/the-join-function
 // This only does it for one list of fs, but I want apply as list of f and list of x so I used flatmap and some stuff
 // because it did not have any generators I could understand...
-func ListApply<A,B>(_ fOpt: (Array<(A) -> (B)>)) -> (_ xOpt: Array<A>) -> (Array<B>) {
-    { xOpt in
-        fOpt.flatMap { 
-            f in xOpt.map { x in f(x)}} 
+func ListApply<A,B>(_ f: (Array<(A) -> (B)>)) -> (_ x: Array<A>) -> (Array<B>) {
+    { x in
+        f.flatMap { 
+            f in x.map { x in f(x)}} 
     }
 }
 
@@ -100,4 +100,11 @@ func OptBind<A,B>(_ fOpt: @escaping ((A) -> Optional<(B)>)) -> (_ xOpt: Optional
     }
 }
 
+/* func ListBind<A,B>(_ f: ((A) -> Array<(B)>)) -> (_ x: Array<A>) -> (Array<B>) {
+    { xOpt in
+        fOpt.flatMap { 
+            f in xOpt.map { x in f(x)}} 
+    }
+}
 
+*/
