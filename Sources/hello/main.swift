@@ -100,11 +100,8 @@ func OptBind<A,B>(_ fOpt: @escaping ((A) -> Optional<(B)>)) -> (_ xOpt: Optional
     }
 }
 
-/* func ListBind<A,B>(_ f: ((A) -> Array<(B)>)) -> (_ x: Array<A>) -> (Array<B>) {
-    { xOpt in
-        fOpt.flatMap { 
-            f in xOpt.map { x in f(x)}} 
+func ListBind<A,B>(_ f: @escaping ((A) -> Array<(B)>)) -> (_ xs: Array<A>) -> (Array<B>) {
+    { xs in
+        xs.flatMap { x in f(x) }
     }
 }
-
-*/
