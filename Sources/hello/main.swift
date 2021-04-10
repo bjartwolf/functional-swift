@@ -79,7 +79,7 @@ let result = maybeTwoerAdder(aFive)
 print(result)
 
 // And it works for nonoptional values too 
-let result2 = maybeTwoerAdder(.none)
+let result2 = maybeTwoerAdder(Int("Five"))
 print(result2)
 
 // We can now use the same function on lists by lifting it to lists
