@@ -144,3 +144,21 @@ print(mappedOrderQty(parseNumbers2(someNumbers)))
 // nested optionals sucks. me should bind those... (we can also bind them with id I think for later)
 let boundOrderQty = ListMap(OptBind(OrderQty))
 print(boundOrderQty(parseNumbers2(someNumbers)))
+
+
+precedencegroup ForwardPipe {
+     associativity: left
+}
+
+infix operator |> : ForwardPipe
+
+func |> <T, U>(value: T, function: ((T) -> U)) -> U {
+     return function(value)
+}
+
+
+let foo = someNumbers
+          |> (parseNumber |> ListMap)
+          |> (OrderQty |> OptBind |> ListMap) 
+
+print(foo)
