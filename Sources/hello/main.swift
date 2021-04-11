@@ -146,6 +146,8 @@ let boundOrderQty = ListMap(OptBind(OrderQty))
 print(boundOrderQty(parseNumbers2(someNumbers)))
 
 
+// Found these here, works like a charm. Not sure if I should implement backwards pipe or not.
+// https://medium.com/dev-genius/forward-pipe-or-pipe-forward-in-swift-3a6da6f9c000
 precedencegroup ForwardPipe {
      associativity: left
 }
