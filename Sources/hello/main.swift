@@ -72,20 +72,20 @@ print(addTwo(5))
 let maybeTwoerAdder = OptMap(addTwo)
 
 let aFive = Int("5") 
-print(aFive)
+//print(aFive)
 
 // So we can use it with an optional number with a value
 let result = maybeTwoerAdder(aFive)
-print(result)
+//print(result)
 
 // And it works for for the .none types too 
 let result2 = maybeTwoerAdder(Int("Five"))
-print(result2)
+//print(result2)
 
 // We can now use the same function on lists by lifting it to lists
 let listAdder = ListMap(addTwo)
 
-print(listAdder([1,2,3]))
+//print(listAdder([1,2,3]))
 
 
 // Have not tested them, the signature looks ok but need to figure out if they work
@@ -128,7 +128,7 @@ print(parseNumbers2(someNumbers))
 
 // We also made a function that we lifted from summing numbers to summing optional numbers. We can lift that one to work on lists as well
 let maybeTwoerListerAdder = ListMap(maybeTwoerAdder) 
-print(maybeTwoerListerAdder(parseNumbers2(someNumbers)))
+//print(maybeTwoerListerAdder(parseNumbers2(someNumbers)))
 
 // for some more world crossing
 func OrderQty (_ qty: Int) -> Optional<Int> {
@@ -139,11 +139,11 @@ func OrderQty (_ qty: Int) -> Optional<Int> {
 
 // if we try to map this we get optional optionals.
 let mappedOrderQty = ListMap(OptMap(OrderQty))
-print(mappedOrderQty(parseNumbers2(someNumbers)))
+//print(mappedOrderQty(parseNumbers2(someNumbers)))
 
 // nested optionals sucks. me should bind those... (we can also bind them with id I think for later)
 let boundOrderQty = ListMap(OptBind(OrderQty))
-print(boundOrderQty(parseNumbers2(someNumbers)))
+//print(boundOrderQty(parseNumbers2(someNumbers)))
 
 
 // Found these here, works like a charm. Not sure if I should implement backwards pipe or not.
@@ -158,9 +158,139 @@ func |> <T, U>(value: T, function: ((T) -> U)) -> U {
      return function(value)
 }
 
+class Future<Value> {
+    typealias Result = Swift.Result<Value, Error>
 
-let foo = someNumbers
-          |> (parseNumber |> ListMap)
-          |> (OrderQty |> OptBind |> ListMap) 
+    fileprivate var result: Result? {
+        // Observe whenever a result is assigned, and report it:
+        didSet { result.map(report) }
+    }
+    private var callbacks = [(Result) -> Void]()
 
-print(foo)
+    func observe(using callback: @escaping (Result) -> Void) {
+        // If a result has already been set, call the callback directly:
+        if let result = result {
+            return callback(result)
+        }
+
+        callbacks.append(callback)
+    }
+
+    private func report(result: Result) {
+        callbacks.forEach { $0(result) }
+        callbacks = []
+    }
+
+    public static func fromValue<T>(_ value: T) -> Future<T>{
+        let future = Future<T>()
+        future.result = .success(value)
+        return future
+    }
+
+    public static func fromError<T>(_ error: Error) -> Future<T>{
+        let future = Future<T>()
+        future.result = .failure(error)
+        return future
+    }
+}
+
+func FuturePure<T>(_ x: T) -> Future<T> {
+    Future<T>.fromValue(x)
+}
+
+FuturePure(3)
+
+class Promise<Value>: Future<Value> {
+    init(value: Value? = nil) {
+        super.init()
+
+        // If the value was already known at the time the promise
+        // was constructed, we can report it directly:
+        result = value.map(Result.success)
+    }
+
+    func resolve(with value: Value) {
+        result = .success(value)
+    }
+
+    func reject(with error: Error) {
+        result = .failure(error)
+    }
+}
+
+extension Future {
+    func chained<T>(
+        using closure: @escaping (Value) throws -> Future<T>
+    ) -> Future<T> {
+        // We'll start by constructing a "wrapper" promise that will be
+        // returned from this method:
+        let promise = Promise<T>()
+
+        // Observe the current future:
+        observe { result in
+            switch result {
+            case .success(let value):
+                do {
+                    // Attempt to construct a new future using the value
+                    // returned from the first one:
+                    let future = try closure(value)
+
+                    // Observe the "nested" future, and once it
+                    // completes, resolve/reject the "wrapper" future:
+                    future.observe { result in
+                        switch result {
+                        case .success(let value):
+                            promise.resolve(with: value)
+                        case .failure(let error):
+                            promise.reject(with: error)
+                        }
+                    }
+                } catch {
+                    promise.reject(with: error)
+                }
+            case .failure(let error):
+                promise.reject(with: error)
+            }
+        }
+
+        return promise
+    }
+}
+
+
+func FutureApply<A,B>(_ fFut: (Future<(A) -> (B)>)) -> (Future<A>) -> (Future<B>)
+{
+    { (xFut: Future<A>) in
+        let p = Promise<B>()
+        fFut.observe { (result) in
+            switch result {
+            case .failure(let error):
+                p.reject(with: error)
+            case .success(let fRes):
+                xFut.observe(using: { x in
+                    switch x {
+                    case .failure(let xerr):
+                        p.reject(with: xerr)
+                    case .success(let xval):
+                        p.resolve(with: fRes(xval))                    }
+                })
+            }
+        }
+        return p
+    }
+}
+
+func FutureMap<A,B>(_ fn: @escaping (A)->(B)) -> ((Future<A>) -> (Future<B>)) {
+    FutureApply(FuturePure(fn))
+}
+// Promise er ern applicaktiv funktor
+
+let p = Promise<Int>()
+		
+
+let futureAddTwo = FutureMap(addTwo)
+
+let futureNumber = futureAddTwo(p)
+p.resolve(with: 4)
+
+print(futureNumber.result)
